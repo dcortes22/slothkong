@@ -25,7 +25,7 @@ extension BaseRequestHandler where Self: Endpoint {
     
     func request() async throws -> (Data, URLResponse) {
         var dataTuple:(Data, URLResponse) = (Data(), URLResponse())
-        if #available(iOS 15.0, *) {
+        if #available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *) {
             dataTuple = try await session.data(for: self.asURLRequest())
         } else {
             dataTuple = try await session.dataAsync(for: self.asURLRequest())
