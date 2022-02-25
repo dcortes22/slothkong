@@ -11,6 +11,31 @@ final class SlothKongTests: XCTestCase {
         cancellables = []
     }
     
+    func testNewPost() throws {
+        var error: SlothError?
+        let expectation = self.expectation(description: "New Post")
+        let post = Post(userId: 1, id: 0, title: "Test", body: "Hola mundo")
+        var responsePost:Post?
+        PostsEndpoint.post(post: post).requestPublisher(Post.self)
+            .sink { completion in
+                switch completion {
+                case .failure(let encounteredError):
+                    error = encounteredError
+                case .finished:
+                    break
+                }
+                expectation.fulfill()
+            } receiveValue: { post in
+                responsePost = post
+            }
+            .store(in: &cancellables)
+        
+        waitForExpectations(timeout: 10)
+        XCTAssertNil(error)
+        XCTAssertEqual(post.body, responsePost?.body)
+
+    }
+    
     func testSendMultipart() throws {
         var error: SlothError?
         let expectation = self.expectation(description: "MUltipart")

@@ -15,10 +15,11 @@ enum PostsEndpoint: URLRequestBase {
     case notfound
     case query
     case multipart
+    case post(post: Post)
     
     var baseURL: URL {
         switch self {
-        case .posts, .query, .multipart:
+        case .posts, .query, .multipart, .post(_):
             return URL(string: "https://jsonplaceholder.typicode.com/")!
         case .timeout:
             return URL(string: "https://httpstat.us/200")!
@@ -29,7 +30,7 @@ enum PostsEndpoint: URLRequestBase {
     
     var path: String {
         switch self {
-        case .posts, .query:
+        case .posts, .query, .post(_):
             return "posts"
         case .timeout, .notfound, .multipart:
             return ""
@@ -53,12 +54,18 @@ enum PostsEndpoint: URLRequestBase {
             var parameters = Parameters()
             parameters["userId"] = 2
             return parameters
+        case .post(post: let post):
+            var parameters = Parameters()
+            parameters["userId"] = post.userId
+            parameters["body"] = post.body
+            parameters["title"] = post.title
+            return parameters
         }
     }
     
     var method: HTTPMethod {
         switch self {
-        case .multipart:
+        case .multipart, .post(_):
             return .post
         default:
             return .get
