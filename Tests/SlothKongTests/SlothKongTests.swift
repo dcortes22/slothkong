@@ -17,6 +17,7 @@ final class SlothKongTests: XCTestCase {
         let post = Post(userId: 1, id: 0, title: "Test", body: "Hola mundo")
         var responsePost:Post?
         PostsEndpoint.post(post: post).requestPublisher(Post.self)
+            .receive(on: OperationQueue.main)
             .sink { completion in
                 switch completion {
                 case .failure(let encounteredError):
@@ -40,6 +41,7 @@ final class SlothKongTests: XCTestCase {
         var error: SlothError?
         let expectation = self.expectation(description: "MUltipart")
         PostsEndpoint.multipart.requestPublisher(MultipartData(data: "Café".data(using: .utf8)!, mimeType: .jpeg, fileName: "test", name: "Test"))
+            .receive(on: OperationQueue.main)
             .sink { result in
                 switch result {
                 case .failure(let encounteredError):

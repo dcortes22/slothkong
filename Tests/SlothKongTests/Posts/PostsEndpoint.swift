@@ -8,7 +8,7 @@
 import Foundation
 @testable import SlothKong
 
-enum PostsEndpoint: URLRequestBase {
+enum PostsEndpoint: Endpoint {
     
     case posts
     case timeout

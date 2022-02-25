@@ -1,5 +1,5 @@
 //
-//  URLRequestBase.swift
+//  Endpoint.swift
 //  
 //
 //  Created by David Cortes on 23/2/22.
@@ -10,7 +10,7 @@ import Combine
 
 public typealias Parameters = [String: Any]
 
-protocol URLRequestBase: URLRequestType, BaseRequestHandler {
+protocol Endpoint: URLRequestType, BaseRequestHandler {
     
     var baseURL: URL { get }
     
@@ -23,7 +23,7 @@ protocol URLRequestBase: URLRequestType, BaseRequestHandler {
     var headers: HTTPHeaders? { get }
 }
 
-extension URLRequestBase {
+extension Endpoint {
     
     var requestURL: URL {
         return baseURL.appendingPathComponent(path)

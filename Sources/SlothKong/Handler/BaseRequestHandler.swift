@@ -10,7 +10,7 @@ import Combine
 
 protocol BaseRequestHandler: SlothResponse {}
 
-extension BaseRequestHandler where Self: URLRequestBase {
+extension BaseRequestHandler where Self: Endpoint {
     
     var progress: PassthroughSubject<(id: Int, progress: Double), Never> {
         return .init()
