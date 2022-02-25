@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  MimeType.swift
 //  
 //
 //  Created by David Cortes on 24/2/22.

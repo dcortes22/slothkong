@@ -45,6 +45,14 @@ extension URLRequestBase {
         return request
     }
     
+    func asUploadRequest() throws -> URLRequest {
+        var request = try encoding.encode(urlRequest, with: nil)
+        if let headers = self.headers {
+            request.headers = headers
+        }
+        return request
+    }
+    
     func asURLRequest() throws -> URLRequest {
         var request = try encoding.encode(urlRequest, with: parameters)
         if let headers = self.headers {

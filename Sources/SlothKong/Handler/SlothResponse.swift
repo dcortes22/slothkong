@@ -8,6 +8,8 @@
 import Foundation
 import Combine
 
-public protocol SlothResponse {
+protocol SlothResponse {
     var session: URLSession { get }
+    
+    var progress: PassthroughSubject<(id: Int, progress: Double), Never> { get }
 }

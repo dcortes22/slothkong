@@ -11,6 +11,38 @@ final class SlothKongTests: XCTestCase {
         cancellables = []
     }
     
+    func testSendMultipart() throws {
+        var error: SlothError?
+        let expectation = self.expectation(description: "MUltipart")
+        PostsEndpoint.multipart.requestPublisher(MultipartData(data: "Café".data(using: .utf8)!, mimeType: .jpeg, fileName: "test", name: "Test"))
+            .sink { result in
+                switch result {
+                case .failure(let encounteredError):
+                    error = encounteredError
+                case .finished:
+                    break
+                }
+                expectation.fulfill()
+            } receiveValue: { uploadResponse in
+                switch uploadResponse {
+                case let .progress(percentage):
+                    print("Porcentaje \(percentage)")
+                    expectation.fulfill()
+                    break
+                case let .response(data):
+                    print("Data \(data)")
+                    expectation.fulfill()
+                    break
+                }
+            }
+            .store(in: &cancellables)
+        
+        waitForExpectations(timeout: 10)
+        let expected = SlothError.connectionFailed(reason: .internalError(404))
+        XCTAssertEqual(error, expected)
+
+    }
+    
     func testQueryParametersPost() throws {
         var error: SlothError?
         var posts = [Post]()
