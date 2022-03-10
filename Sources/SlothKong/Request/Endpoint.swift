@@ -10,7 +10,7 @@ import Combine
 
 public typealias Parameters = [String: Any]
 
-protocol Endpoint: URLRequestType, BaseRequestHandler {
+public protocol Endpoint: URLRequestType, BaseRequestHandler {
     
     var baseURL: URL { get }
     

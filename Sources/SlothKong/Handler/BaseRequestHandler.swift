@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-protocol BaseRequestHandler: SlothResponse {}
+public protocol BaseRequestHandler: SlothResponse {}
 
 extension BaseRequestHandler where Self: Endpoint {
     
