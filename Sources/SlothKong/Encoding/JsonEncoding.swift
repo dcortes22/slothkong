@@ -18,7 +18,7 @@ public struct JSONEncoding: ParameterEncoding {
         self.options = options
     }
     
-    public func encode(_ urlRequest: URLRequestType, with parameters: Parameters?) throws -> URLRequest {
+    public func encode(_ urlRequest: URLRequestType, with parameters: Parameters?, multiPartData: MultipartData? = nil) throws -> URLRequest {
         var urlRequest = try urlRequest.asURLRequest()
 
         guard let parameters = parameters else { return urlRequest }

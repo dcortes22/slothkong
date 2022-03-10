@@ -147,11 +147,9 @@ PostsEndpoint.multipart.requestPublisher(multipartData)
         switch uploadResponse {
         case let .progress(percentage):
             print("Porcentaje \(percentage)")
-            expectation.fulfill()
             break
         case let .response(data):
             print("Data \(data)")
-            expectation.fulfill()
             break
         }
     }

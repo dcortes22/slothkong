@@ -29,6 +29,9 @@ let package = Package(
             dependencies: []),
         .testTarget(
             name: "SlothKongTests",
-            dependencies: ["SlothKong"]),
+            dependencies: ["SlothKong"],
+            resources: [
+                .copy("Resources/sloth.jpeg"),
+          ])
     ]
 )

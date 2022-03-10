@@ -27,6 +27,13 @@ final class SlothKongTests: XCTestCase {
         
     }
     
+    func testMultipartAddedToBody() throws {
+        let url = Bundle.module.url(forResource: "sloth", withExtension: "jpeg")!
+        let data = MultipartData(data: try! Data(contentsOf: url), mimeType: .jpeg, fileName: "sloth.jpg", name: "sloth")
+        let request = try! MockEndpointSuccess.multipart(parameters: 1, multipartData: data).asURLRequest()
+        XCTAssertNotEqual(request.httpBody, nil)
+    }
+    
     func testHeaders() throws {
         let headers = try! MockEndpointSuccess.list.asURLRequest().allHTTPHeaderFields
         XCTAssertNotEqual(headers, nil)

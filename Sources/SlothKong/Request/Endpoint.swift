@@ -21,6 +21,8 @@ protocol Endpoint: URLRequestType, BaseRequestHandler {
     var method: HTTPMethod { get }
     
     var headers: HTTPHeaders? { get }
+    
+    var multiPartData: MultipartData? { get }
 }
 
 extension Endpoint {
@@ -33,6 +35,12 @@ extension Endpoint {
         switch method {
         case .get:
             return URLEncoding.default
+        case .post:
+            if let _ = multiPartData {
+                return MultipartEncoding.default
+            } else {
+                return JSONEncoding.default
+            }
         default:
             return JSONEncoding.default
         }
@@ -45,16 +53,9 @@ extension Endpoint {
         return request
     }
     
-    func asUploadRequest() throws -> URLRequest {
-        var request = try encoding.encode(urlRequest, with: nil)
-        if let headers = self.headers {
-            request.headers = headers
-        }
-        return request
-    }
-    
     func asURLRequest() throws -> URLRequest {
-        var request = try encoding.encode(urlRequest, with: parameters)
+        var request = try encoding.encode(urlRequest, with: parameters, multiPartData: multiPartData)
+        
         if let headers = self.headers {
             request.headers = headers
         }

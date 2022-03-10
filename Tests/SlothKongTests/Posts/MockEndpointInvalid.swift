@@ -48,5 +48,8 @@ enum MockEndpointInvalid: MockEndpointError {
         }
     }
     
+    var multiPartData: MultipartData? {
+        return nil
+    }
     
 }

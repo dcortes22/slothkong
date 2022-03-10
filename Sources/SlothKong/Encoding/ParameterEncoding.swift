@@ -8,5 +8,5 @@
 import Foundation
 
 public protocol ParameterEncoding {
-    func encode(_ urlRequest: URLRequestType, with parameters: Parameters?) throws -> URLRequest
+    func encode(_ urlRequest: URLRequestType, with parameters: Parameters?, multiPartData: MultipartData?) throws -> URLRequest
 }

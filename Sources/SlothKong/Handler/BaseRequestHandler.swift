@@ -35,61 +35,9 @@ extension BaseRequestHandler where Self: Endpoint {
     
     func requestPublisher(_ data:MultipartData) -> AnyPublisher<UploadResponse, SlothError> {
         let subject: PassthroughSubject<UploadResponse, SlothError> = .init()
-        let boundary = UUID().uuidString
-        var request = try! self.asUploadRequest()
+        let request = try! self.asURLRequest()
         
-        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-        
-        var dataObject = Data()
-        
-        if let parameters = self.parameters {
-            parameters.forEach { parameter in
-                dataObject.append("\r\n--\(boundary)\r\n".data(using: .utf8)!)
-                dataObject.append("Content-Disposition: form-data; name=\"\(parameter.key)\"\r\n\r\n".data(using: .utf8)!)
-                dataObject.append("\(parameter.value)".data(using: .utf8)!)
-            }
-        }
-        
-        dataObject.append("\r\n--\(boundary)\r\n".data(using: .utf8)!)
-        dataObject.append("Content-Disposition: form-data; name=\"\(data.name)\"; filename=\"\(data.fileName)\"\r\n".data(using: .utf8)!)
-        dataObject.append("Content-Type: \(data.mimeType.rawValue)\r\n\r\n".data(using: .utf8)!)
-        dataObject.append(data.data)
-        
-        dataObject.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
-        
-        let task: URLSessionUploadTask = session.uploadTask(with: request, from: dataObject) { data, response, error in
-            if let error = error {
-                subject.send(completion: .failure(SlothError.connectionFailed(reason: .unknown(error.localizedDescription))))
-                return
-            }
-            
-            switch (response as! HTTPURLResponse).statusCode {
-            case (200...299):
-                subject.send(.response(data: data))
-                return
-            case (400...499):
-                subject.send(completion: .failure(SlothError.connectionFailed(reason: .internalError((response as! HTTPURLResponse).statusCode))))
-                return
-            case (500...599):
-                subject.send(completion: .failure(SlothError.connectionFailed(reason: .serverError((response as! HTTPURLResponse).statusCode))))
-                 return
-            default:
-                subject.send(.response(data: nil))
-            }
-        }
-        task.resume()
-        return progress
-                .filter{ $0.id == task.taskIdentifier }
-                .setFailureType(to: SlothError.self)
-                .map { .progress(percentage: $0.progress) }
-                .merge(with: subject)
-                .eraseToAnyPublisher()
-    }
-    
-    func requestUploadPublisher(_ data: MultipartData) throws -> AnyPublisher<UploadResponse, SlothError> {
-        let subject: PassthroughSubject<UploadResponse, SlothError> = .init()
-        
-        let task: URLSessionUploadTask = session.uploadTask(with: try self.asUploadRequest(), from: data.data) { data, response, error in
+        let task: URLSessionUploadTask = session.uploadTask(with: request, from: nil) { data, response, error in
             if let error = error {
                 subject.send(completion: .failure(SlothError.connectionFailed(reason: .unknown(error.localizedDescription))))
                 return
