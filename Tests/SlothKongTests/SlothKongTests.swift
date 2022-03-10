@@ -11,95 +11,34 @@ final class SlothKongTests: XCTestCase {
         cancellables = []
     }
     
-    func testNewPost() throws {
-        var error: SlothError?
-        let expectation = self.expectation(description: "New Post")
-        let post = Post(userId: 1, id: 0, title: "Test", body: "Hola mundo")
-        var responsePost:Post?
-        PostsEndpoint.post(post: post).requestPublisher(Post.self)
-            .receive(on: OperationQueue.main)
-            .sink { completion in
-                switch completion {
-                case .failure(let encounteredError):
-                    error = encounteredError
-                case .finished:
-                    break
-                }
-                expectation.fulfill()
-            } receiveValue: { post in
-                responsePost = post
-            }
-            .store(in: &cancellables)
-        
-        waitForExpectations(timeout: 10)
-        XCTAssertNil(error)
-        XCTAssertEqual(post.body, responsePost?.body)
-
+    func testRequestMethodValid() throws {
+        XCTAssertEqual(try! MockEndpointSuccess.list.asURLRequest().httpMethod, "GET")
     }
     
-    func testSendMultipart() throws {
-        var error: SlothError?
-        let expectation = self.expectation(description: "MUltipart")
-        PostsEndpoint.multipart.requestPublisher(MultipartData(data: "Café".data(using: .utf8)!, mimeType: .jpeg, fileName: "test", name: "Test"))
-            .receive(on: OperationQueue.main)
-            .sink { result in
-                switch result {
-                case .failure(let encounteredError):
-                    error = encounteredError
-                case .finished:
-                    break
-                }
-                expectation.fulfill()
-            } receiveValue: { uploadResponse in
-                switch uploadResponse {
-                case let .progress(percentage):
-                    print("Porcentaje \(percentage)")
-                    expectation.fulfill()
-                    break
-                case let .response(data):
-                    print("Data \(data)")
-                    expectation.fulfill()
-                    break
-                }
-            }
-            .store(in: &cancellables)
+    func testQueryParameters() throws {
+        let url = try! MockEndpointSuccess.list.asURLRequest().url?.absoluteString
+        XCTAssertEqual(url, "http://url.com/?user=1")
         
-        waitForExpectations(timeout: 10)
-        let expected = SlothError.connectionFailed(reason: .internalError(404))
-        XCTAssertEqual(error, expected)
-
     }
     
-    func testQueryParametersPost() throws {
-        var error: SlothError?
-        var posts = [Post]()
-        let expectation = self.expectation(description: "PostsTimeout")
+    func testBodyParameters() throws {
+        let data = try! MockEndpointSuccess.new.asURLRequest().httpBody
+        XCTAssertNotEqual(data, nil)
         
-        PostsEndpoint.query.requestPublisher([Post].self)
-            .sink { result in
-                switch result {
-                case .failure(let encounteredError):
-                    error = encounteredError
-                case .finished:
-                    break
-                }
-                expectation.fulfill()
-            } receiveValue: { value in
-                posts = value
-            }
-            .store(in: &cancellables)
+    }
+    
+    func testHeaders() throws {
+        let headers = try! MockEndpointSuccess.list.asURLRequest().allHTTPHeaderFields
+        XCTAssertNotEqual(headers, nil)
         
-        waitForExpectations(timeout: 10)
-        XCTAssertNil(error)
-        XCTAssertEqual(posts.first?.userId, 2)
     }
     
     func test404Error() throws {
         var error: SlothError?
 
-        let expectation = self.expectation(description: "PostsTimeout")
-        
-        PostsEndpoint.notfound.requestPublisher([Post].self)
+        let expectation = self.expectation(description: "Error 404")
+
+        MockEndpointInvalid.errorNotFound.requestPublisher([MockModel].self)
             .sink{ result in
                 switch result {
                 case .failure(let encounteredError):
@@ -111,46 +50,19 @@ final class SlothKongTests: XCTestCase {
             } receiveValue: { _ in
             }
             .store(in: &cancellables)
-        
+
         waitForExpectations(timeout: 20)
         let expected = SlothError.connectionFailed(reason: .internalError(404))
         XCTAssertEqual(error, expected)
     }
     
-    func testTimeOutError() throws {
-        var error: SlothError?
-
-        let expectation = self.expectation(description: "PostsTimeout")
-        
-        PostsEndpoint.timeout.requestPublisher([Post].self)
-            .sink{ result in
-                switch result {
-                case .failure(let encounteredError):
-                    error = encounteredError
-                case .finished:
-                    break
-                }
-                expectation.fulfill()
-            } receiveValue: { _ in
-            }
-            .store(in: &cancellables)
-        
-        waitForExpectations(timeout: 20)
-        let expected = SlothError.connectionFailed(reason: .timeout)
-        XCTAssertEqual(error, expected)
-    }
-    
     func testGetPostRequestPublisher() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct
-        // results.
-        
-        var posts = [Post]()
+        var posts = [MockModel]()
         var error: SlothError?
         
         let expectation = self.expectation(description: "Posts")
         
-        PostsEndpoint.posts.requestPublisher([Post].self)
+        MockEndpointSuccess.list.requestPublisher([MockModel].self)
             .sink { result in
                 switch result {
                 case .failure(let encounteredError):
@@ -164,9 +76,9 @@ final class SlothKongTests: XCTestCase {
             }
             .store(in: &cancellables)
         
-        waitForExpectations(timeout: 10)
+        waitForExpectations(timeout: 1)
         
         XCTAssertNil(error)
-        XCTAssertEqual(posts.first?.title, "sunt aut facere repellat provident occaecati excepturi optio reprehenderit")
+        XCTAssertEqual(posts.count, 2)
     }
 }
