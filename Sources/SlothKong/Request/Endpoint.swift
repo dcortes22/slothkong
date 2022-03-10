@@ -25,7 +25,7 @@ public protocol Endpoint: URLRequestType, BaseRequestHandler {
     var multiPartData: MultipartData? { get }
 }
 
-extension Endpoint {
+public extension Endpoint {
     
     var requestURL: URL {
         return baseURL.appendingPathComponent(path)

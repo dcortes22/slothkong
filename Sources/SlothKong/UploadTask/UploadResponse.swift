@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum UploadResponse {
+public enum UploadResponse {
     case progress(percentage: Double)
     case response(data: Data?)
 }

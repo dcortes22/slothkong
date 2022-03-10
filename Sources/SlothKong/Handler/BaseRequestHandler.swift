@@ -10,7 +10,7 @@ import Combine
 
 public protocol BaseRequestHandler: SlothResponse {}
 
-extension BaseRequestHandler where Self: Endpoint {
+public extension BaseRequestHandler where Self: Endpoint {
     
     var progress: PassthroughSubject<(id: Int, progress: Double), Never> {
         return .init()
