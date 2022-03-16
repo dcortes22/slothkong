@@ -27,7 +27,7 @@ public extension BaseRequestHandler where Self: Endpoint {
     }
     
     var session: URLSession {
-        let sessionConfig = URLSessionConfiguration.default
+        let sessionConfig = URLSessionConfiguration.ephemeral
         sessionConfig.timeoutIntervalForRequest = maxTimeout
         return URLSession(configuration: sessionConfig, delegate: UploadResponseDelegate(subjec: progress), delegateQueue: nil)
     }
