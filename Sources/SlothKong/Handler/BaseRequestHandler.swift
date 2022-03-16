@@ -8,18 +8,27 @@
 import Foundation
 import Combine
 
-public protocol BaseRequestHandler: SlothResponse {}
+public protocol BaseRequestHandler: SlothResponse {
+    var defaultTimeout:Double { get }
+}
 
 public extension BaseRequestHandler where Self: Endpoint {
+    
+    var defaultTimeout: Double {
+        return 60
+    }
     
     var progress: PassthroughSubject<(id: Int, progress: Double), Never> {
         return .init()
     }
     
+    var maxTimeout: Double {
+        return defaultTimeout
+    }
+    
     var session: URLSession {
-        let sessionConfig = URLSessionConfiguration.ephemeral
-        sessionConfig.timeoutIntervalForRequest = 20
-        sessionConfig.timeoutIntervalForResource = 6.0
+        let sessionConfig = URLSessionConfiguration.default
+        sessionConfig.timeoutIntervalForRequest = maxTimeout
         return URLSession(configuration: sessionConfig, delegate: UploadResponseDelegate(subjec: progress), delegateQueue: nil)
     }
     

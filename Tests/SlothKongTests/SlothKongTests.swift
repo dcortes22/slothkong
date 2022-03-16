@@ -63,6 +63,14 @@ final class SlothKongTests: XCTestCase {
         XCTAssertEqual(error, expected)
     }
     
+    func testMaxTimeout() throws {
+        XCTAssertEqual(MockEndpointInvalid.timeout.maxTimeout, 10)
+    }
+    
+    func testMaxTimeoutDefault() throws {
+        XCTAssertEqual(MockEndpointInvalid.errorNotFound.maxTimeout, 60)
+    }
+    
     func testGetPostRequestPublisher() throws {
         var posts = [MockModel]()
         var error: SlothError?
